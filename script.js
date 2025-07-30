@@ -1,3 +1,8 @@
+const SUPABASE_URL = 'https://bsgj3w47v0j3iag9lhjv-g.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_bsgj3w47v0J3iAg9lhJV-g_efBs9ioa';
+
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const gallery = document.getElementById('gallery');
 const modal = document.getElementById('modal');
 const modalImg = document.getElementById('modal-img');
@@ -10,11 +15,8 @@ const modeToggle = document.getElementById('mode-toggle');
 let currentCategory = 'all';
 let currentDevice = 'Telefon';
 
-// Hent bilder fra Supabase Storage
 async function fetchImages(category, device) {
   let prefix = `car-wallpapers/${device}/${category === 'all' ? '' : category}`;
-
-  // Fjern doble skråstreker og trailing slash
   prefix = prefix.replace(/\/+/g, '/').replace(/\/$/, '');
 
   const { data, error } = await supabase.storage
@@ -29,17 +31,16 @@ async function fetchImages(category, device) {
 }
 
 function getImageURL(path) {
-  return `https://bsgj3w47v0j3iag9lhjv-g.supabase.co/storage/v1/object/public/car-wallpapers/${path}`;
+  return `${SUPABASE_URL}/storage/v1/object/public/car-wallpapers/${path}`;
 }
 
 async function loadImages(category) {
   gallery.innerHTML = '';
   let imgs = [];
 
-  if (category === 'all') {
-    // Hent fra alle kategorier for valgt device
-    const cats = ['BMW', 'Toyota', 'Porsche'];
-    for (const cat of cats) {
+  if(category === 'all') {
+    const categoriesList = ['BMW', 'Toyota', 'Porsche'];
+    for (const cat of categoriesList) {
       const data = await fetchImages(cat, currentDevice);
       imgs = imgs.concat(data);
     }
@@ -49,17 +50,17 @@ async function loadImages(category) {
 
   imgs.forEach((imgObj, i) => {
     const img = document.createElement('img');
-    img.src = getImageURL(imgObj.name);
+    img.src = getImageURL(`${currentDevice}/${imgObj.name}`);
     img.alt = `Car wallpaper ${category} ${i + 1}`;
     img.style.opacity = '0';
-    img.style.transition = 'opacity 0.6s ease ' + (i * 0.15) + 's';
+    img.style.transition = `opacity 0.6s ease ${i * 0.15}s`;
     img.addEventListener('load', () => {
       img.style.opacity = '1';
     });
     img.addEventListener('click', () => {
-      modalImg.src = getImageURL(imgObj.name);
+      modalImg.src = img.src;
       modalImg.alt = `Car wallpaper large ${category} ${i + 1}`;
-      downloadLink.href = getImageURL(imgObj.name);
+      downloadLink.href = img.src;
       modal.classList.add('active');
       modal.setAttribute('aria-hidden', 'false');
     });
@@ -85,12 +86,14 @@ categories.forEach(btn => {
   });
 });
 
-// Modal close events
+// Close modal button
 closeBtn.addEventListener('click', () => {
   modal.classList.remove('active');
   modal.setAttribute('aria-hidden', 'true');
   modalImg.src = '';
 });
+
+// Close modal clicking outside image
 modal.addEventListener('click', e => {
   if (e.target === modal) {
     modal.classList.remove('active');
@@ -98,6 +101,8 @@ modal.addEventListener('click', e => {
     modalImg.src = '';
   }
 });
+
+// Close modal with ESC key
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && modal.classList.contains('active')) {
     modal.classList.remove('active');
@@ -128,15 +133,17 @@ modeToggle.addEventListener('click', () => {
   darkModeOn = !darkModeOn;
   setDarkMode(darkModeOn);
 });
+
 modeToggle.addEventListener('mouseenter', () => {
   modeToggle.textContent = darkModeOn ? 'Switch to Light Mode' : 'Switch to Dark Mode';
 });
 modeToggle.addEventListener('mouseleave', () => {
   modeToggle.textContent = darkModeOn ? 'Light Mode' : 'Dark Mode';
 });
+
 modeToggle.textContent = darkModeOn ? 'Light Mode' : 'Dark Mode';
 
-// Download funksjon
+// Download button forced download function
 downloadLink.addEventListener('click', e => {
   e.preventDefault();
   if (!modalImg.src) return;
@@ -148,5 +155,5 @@ downloadLink.addEventListener('click', e => {
   document.body.removeChild(link);
 });
 
-// Last inn bilder første gang siden åpnes
+// Last inn bilder når siden lastes
 loadImages(currentCategory);
