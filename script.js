@@ -1,3 +1,4 @@
+// Init Supabase klient
 const SUPABASE_URL = 'https://bsgj3w47v0j3iag9lhjv-g.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_bsgj3w47v0J3iAg9lhJV-g_efBs9ioa';
 
@@ -16,51 +17,60 @@ let currentCategory = 'all';
 let currentDevice = 'Telefon';
 
 async function fetchImages(category, device) {
-  let prefix = `car-wallpapers/${device}/${category === 'all' ? '' : category}`;
-  prefix = prefix.replace(/\/+/g, '/').replace(/\/$/, '');
-
+  let path = `car-wallpapers/${device}`;
+  if (category !== 'all') {
+    path += `/${category}`;
+  }
+  
   const { data, error } = await supabase.storage
     .from('car-wallpapers')
-    .list(prefix, { limit: 100, offset: 0, sortBy: { column: 'name', order: 'asc' } });
-
+    .list(path, { limit: 100, offset: 0, sortBy: { column: 'name', order: 'asc' } });
+    
   if (error) {
-    console.error('Feil ved henting av bilder:', error);
+    console.error('Error fetching images:', error.message);
     return [];
   }
   return data;
 }
 
 function getImageURL(path) {
-  return `${SUPABASE_URL}/storage/v1/object/public/car-wallpapers/${path}`;
+  return `${SUPABASE_URL}/storage/v1/object/public/${path}`;
 }
 
 async function loadImages(category) {
   gallery.innerHTML = '';
-  let imgs = [];
+  let images = [];
 
-  if(category === 'all') {
-    const categoriesList = ['BMW', 'Toyota', 'Porsche'];
-    for (const cat of categoriesList) {
-      const data = await fetchImages(cat, currentDevice);
-      imgs = imgs.concat(data);
+  if (category === 'all') {
+    const cats = ['BMW', 'Toyota', 'Porsche'];
+    for (const cat of cats) {
+      const imgs = await fetchImages(cat, currentDevice);
+      images = images.concat(imgs.map(img => ({
+        ...img,
+        path: `car-wallpapers/${currentDevice}/${cat}/${img.name}`
+      })));
     }
   } else {
-    imgs = await fetchImages(category, currentDevice);
+    const imgs = await fetchImages(category, currentDevice);
+    images = imgs.map(img => ({
+      ...img,
+      path: `car-wallpapers/${currentDevice}/${category}/${img.name}`
+    }));
   }
 
-  imgs.forEach((imgObj, i) => {
+  images.forEach((imgObj, i) => {
     const img = document.createElement('img');
-    img.src = getImageURL(`${currentDevice}/${imgObj.name}`);
-    img.alt = `Car wallpaper ${category} ${i + 1}`;
+    img.src = getImageURL(imgObj.path);
+    img.alt = `Car wallpaper ${currentCategory} ${i + 1}`;
     img.style.opacity = '0';
     img.style.transition = `opacity 0.6s ease ${i * 0.15}s`;
     img.addEventListener('load', () => {
       img.style.opacity = '1';
     });
     img.addEventListener('click', () => {
-      modalImg.src = img.src;
-      modalImg.alt = `Car wallpaper large ${category} ${i + 1}`;
-      downloadLink.href = img.src;
+      modalImg.src = getImageURL(imgObj.path);
+      modalImg.alt = `Car wallpaper large ${currentCategory} ${i + 1}`;
+      downloadLink.href = getImageURL(imgObj.path);
       modal.classList.add('active');
       modal.setAttribute('aria-hidden', 'false');
     });
@@ -68,7 +78,6 @@ async function loadImages(category) {
   });
 }
 
-// Device switch change event
 deviceSwitchRadios.forEach(radio => {
   radio.addEventListener('change', () => {
     currentDevice = radio.value;
@@ -76,7 +85,6 @@ deviceSwitchRadios.forEach(radio => {
   });
 });
 
-// Category button events
 categories.forEach(btn => {
   btn.addEventListener('click', () => {
     categories.forEach(b => b.classList.remove('active'));
@@ -86,15 +94,13 @@ categories.forEach(btn => {
   });
 });
 
-// Close modal button
 closeBtn.addEventListener('click', () => {
   modal.classList.remove('active');
   modal.setAttribute('aria-hidden', 'true');
   modalImg.src = '';
 });
 
-// Close modal clicking outside image
-modal.addEventListener('click', e => {
+modal.addEventListener('click', (e) => {
   if (e.target === modal) {
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
@@ -102,8 +108,7 @@ modal.addEventListener('click', e => {
   }
 });
 
-// Close modal with ESC key
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && modal.classList.contains('active')) {
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
@@ -111,7 +116,6 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// Dark mode toggle and persist
 function setDarkMode(enabled) {
   if (enabled) {
     document.body.classList.add('dark-mode');
@@ -143,8 +147,9 @@ modeToggle.addEventListener('mouseleave', () => {
 
 modeToggle.textContent = darkModeOn ? 'Light Mode' : 'Dark Mode';
 
-// Download button forced download function
-downloadLink.addEventListener('click', e => {
+loadImages(currentCategory);
+
+downloadLink.addEventListener('click', (e) => {
   e.preventDefault();
   if (!modalImg.src) return;
   const link = document.createElement('a');
@@ -154,6 +159,3 @@ downloadLink.addEventListener('click', e => {
   link.click();
   document.body.removeChild(link);
 });
-
-// Last inn bilder når siden lastes
-loadImages(currentCategory);
