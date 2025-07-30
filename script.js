@@ -1,8 +1,3 @@
-const SUPABASE_URL = 'https://bsgj3w47v0j3iag9lhjv-g.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_bsgj3w47v0J3iAg9lhJV-g_efBs9ioa';
-
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 const gallery = document.getElementById('gallery');
 const modal = document.getElementById('modal');
 const modalImg = document.getElementById('modal-img');
@@ -15,11 +10,14 @@ const modeToggle = document.getElementById('mode-toggle');
 let currentCategory = 'all';
 let currentDevice = 'Telefon';
 
+// Hent bilder fra Supabase Storage
 async function fetchImages(category, device) {
   let prefix = `car-wallpapers/${device}/${category === 'all' ? '' : category}`;
+
+  // Fjern doble skråstreker og trailing slash
   prefix = prefix.replace(/\/+/g, '/').replace(/\/$/, '');
 
-  let { data, error } = await supabase.storage
+  const { data, error } = await supabase.storage
     .from('car-wallpapers')
     .list(prefix, { limit: 100, offset: 0, sortBy: { column: 'name', order: 'asc' } });
 
@@ -31,7 +29,7 @@ async function fetchImages(category, device) {
 }
 
 function getImageURL(path) {
-  return `${SUPABASE_URL}/storage/v1/object/public/car-wallpapers/${path}`;
+  return `https://bsgj3w47v0j3iag9lhjv-g.supabase.co/storage/v1/object/public/car-wallpapers/${path}`;
 }
 
 async function loadImages(category) {
@@ -39,6 +37,7 @@ async function loadImages(category) {
   let imgs = [];
 
   if (category === 'all') {
+    // Hent fra alle kategorier for valgt device
     const cats = ['BMW', 'Toyota', 'Porsche'];
     for (const cat of cats) {
       const data = await fetchImages(cat, currentDevice);
@@ -50,17 +49,17 @@ async function loadImages(category) {
 
   imgs.forEach((imgObj, i) => {
     const img = document.createElement('img');
-    img.src = getImageURL(`${currentDevice}/${imgObj.name}`);
+    img.src = getImageURL(imgObj.name);
     img.alt = `Car wallpaper ${category} ${i + 1}`;
     img.style.opacity = '0';
-    img.style.transition = `opacity 0.6s ease ${i * 0.15}s`;
+    img.style.transition = 'opacity 0.6s ease ' + (i * 0.15) + 's';
     img.addEventListener('load', () => {
       img.style.opacity = '1';
     });
     img.addEventListener('click', () => {
-      modalImg.src = getImageURL(`${currentDevice}/${imgObj.name}`);
+      modalImg.src = getImageURL(imgObj.name);
       modalImg.alt = `Car wallpaper large ${category} ${i + 1}`;
-      downloadLink.href = getImageURL(`${currentDevice}/${imgObj.name}`);
+      downloadLink.href = getImageURL(imgObj.name);
       modal.classList.add('active');
       modal.setAttribute('aria-hidden', 'false');
     });
@@ -68,6 +67,7 @@ async function loadImages(category) {
   });
 }
 
+// Device switch change event
 deviceSwitchRadios.forEach(radio => {
   radio.addEventListener('change', () => {
     currentDevice = radio.value;
@@ -75,6 +75,7 @@ deviceSwitchRadios.forEach(radio => {
   });
 });
 
+// Category button events
 categories.forEach(btn => {
   btn.addEventListener('click', () => {
     categories.forEach(b => b.classList.remove('active'));
@@ -84,12 +85,12 @@ categories.forEach(btn => {
   });
 });
 
+// Modal close events
 closeBtn.addEventListener('click', () => {
   modal.classList.remove('active');
   modal.setAttribute('aria-hidden', 'true');
   modalImg.src = '';
 });
-
 modal.addEventListener('click', e => {
   if (e.target === modal) {
     modal.classList.remove('active');
@@ -97,7 +98,6 @@ modal.addEventListener('click', e => {
     modalImg.src = '';
   }
 });
-
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && modal.classList.contains('active')) {
     modal.classList.remove('active');
@@ -106,6 +106,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
+// Dark mode toggle and persist
 function setDarkMode(enabled) {
   if (enabled) {
     document.body.classList.add('dark-mode');
@@ -127,17 +128,15 @@ modeToggle.addEventListener('click', () => {
   darkModeOn = !darkModeOn;
   setDarkMode(darkModeOn);
 });
-
 modeToggle.addEventListener('mouseenter', () => {
   modeToggle.textContent = darkModeOn ? 'Switch to Light Mode' : 'Switch to Dark Mode';
 });
-
 modeToggle.addEventListener('mouseleave', () => {
   modeToggle.textContent = darkModeOn ? 'Light Mode' : 'Dark Mode';
 });
-
 modeToggle.textContent = darkModeOn ? 'Light Mode' : 'Dark Mode';
 
+// Download funksjon
 downloadLink.addEventListener('click', e => {
   e.preventDefault();
   if (!modalImg.src) return;
@@ -149,5 +148,5 @@ downloadLink.addEventListener('click', e => {
   document.body.removeChild(link);
 });
 
-// Start med å laste bilder
+// Last inn bilder første gang siden åpnes
 loadImages(currentCategory);
