@@ -1,6 +1,6 @@
 // Supabase config - erstatt med din URL og key
-const SUPABASE_URL = 'https://din-prosjekt-url.supabase.co';
-const SUPABASE_ANON_KEY = 'din-public-anon-key';
+const SUPABASE_URL = 'https://bsgj3w47v0j3iag9lhjv-g.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_bsgj3w47v0J3iAg9lhJV-g_efBs9ioa';
 
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -163,3 +163,4 @@ downloadLink.addEventListener('click', (e) => {
   link.click();
   document.body.removeChild(link);
 });
+
