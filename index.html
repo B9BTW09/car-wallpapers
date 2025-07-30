@@ -46,7 +46,16 @@
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
 
+  <script>
+    // Initialiser Supabase-klienten her med URL og key dine
+    window.supabase = supabase.createClient(
+      'https://bsgj3w47v0j3iag9lhjv-g.supabase.co',
+      'sb_publishable_bsgj3w47v0J3iAg9lhJV-g_efBs9ioa'
+    );
+  </script>
+
   <!-- Ditt script som bruker Supabase -->
   <script src="script.js"></script>
 </body>
 </html>
+
