@@ -44,7 +44,12 @@
   <button id="mode-toggle" class="mode-toggle">Dark Mode</button>
 
   <!-- Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.js"></script>
+  <script>
+    // Alias supabase til supabaseJs for script.js bruk
+    const supabaseJs = supabase;
+  </script>
+
   <!-- Ditt script som bruker Supabase -->
   <script src="script.js"></script>
 </body>
