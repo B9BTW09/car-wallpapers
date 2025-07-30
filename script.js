@@ -1,8 +1,3 @@
-const SUPABASE_URL = 'https://bsgj3w47v0j3iag9lhjv-g.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_bsgj3w47v0J3iAg9lhJV-g_efBs9ioa';
-
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 const gallery = document.getElementById('gallery');
 const modal = document.getElementById('modal');
 const modalImg = document.getElementById('modal-img');
@@ -15,49 +10,37 @@ const modeToggle = document.getElementById('mode-toggle');
 let currentCategory = 'all';
 let currentDevice = 'Telefon';
 
-async function fetchImages(category, device) {
-  // Hvis kategori er "all", hent alle bilmerker
-  if(category === 'all') {
-    const brands = ['BMW', 'Toyota', 'Porsche'];
-    let allImages = [];
-    for(const brand of brands) {
-      const images = await fetchImages(brand, device);
-      allImages = allImages.concat(images);
-    }
-    return allImages;
-  }
-  
-  const prefix = `${device}/${category}`;
-  const { data, error } = await supabase.storage.from('car-wallpapers').list(prefix);
+// Dummy data for testing
+const images = [
+  {device: 'Telefon', category: 'BMW', src: 'https://via.placeholder.com/400x225?text=BMW+Telefon+1'},
+  {device: 'Telefon', category: 'BMW', src: 'https://via.placeholder.com/400x225?text=BMW+Telefon+2'},
+  {device: 'PC', category: 'BMW', src: 'https://via.placeholder.com/400x225?text=BMW+PC+1'},
+  {device: 'PC', category: 'Toyota', src: 'https://via.placeholder.com/400x225?text=Toyota+PC+1'},
+  {device: 'Telefon', category: 'Porsche', src: 'https://via.placeholder.com/400x225?text=Porsche+Telefon+1'},
+  {device: 'PC', category: 'Porsche', src: 'https://via.placeholder.com/400x225?text=Porsche+PC+1'},
+];
 
-  if(error) {
-    console.error('Error fetching images:', error);
-    return [];
-  }
-  return data;
-}
-
-function getImageURL(path) {
-  return `${SUPABASE_URL}/storage/v1/object/public/car-wallpapers/${path}`;
-}
-
-async function loadImages(category) {
+function loadImages(category) {
   gallery.innerHTML = '';
-  const images = await fetchImages(category, currentDevice);
 
-  images.forEach((imgObj, i) => {
+  const filtered = images.filter(img =>
+    (category === 'all' || img.category === category) &&
+    img.device === currentDevice
+  );
+
+  filtered.forEach((imgObj, i) => {
     const img = document.createElement('img');
-    img.src = getImageURL(`${currentDevice}/${category === 'all' ? imgObj.name : category + '/' + imgObj.name}`);
-    img.alt = `Car wallpaper ${category} ${i + 1}`;
+    img.src = imgObj.src;
+    img.alt = `${imgObj.category} wallpaper ${i + 1}`;
     img.style.opacity = '0';
     img.style.transition = `opacity 0.6s ease ${i * 0.15}s`;
     img.addEventListener('load', () => {
       img.style.opacity = '1';
     });
     img.addEventListener('click', () => {
-      modalImg.src = img.src;
-      modalImg.alt = img.alt;
-      downloadLink.href = img.src;
+      modalImg.src = imgObj.src;
+      modalImg.alt = `Large ${imgObj.category} wallpaper`;
+      downloadLink.href = imgObj.src;
       modal.classList.add('active');
       modal.setAttribute('aria-hidden', 'false');
     });
@@ -65,6 +48,7 @@ async function loadImages(category) {
   });
 }
 
+// Event listeners for device switch
 deviceSwitchRadios.forEach(radio => {
   radio.addEventListener('change', () => {
     currentDevice = radio.value;
@@ -72,6 +56,7 @@ deviceSwitchRadios.forEach(radio => {
   });
 });
 
+// Event listeners for category buttons
 categories.forEach(btn => {
   btn.addEventListener('click', () => {
     categories.forEach(b => b.classList.remove('active'));
@@ -81,6 +66,7 @@ categories.forEach(btn => {
   });
 });
 
+// Close modal
 closeBtn.addEventListener('click', () => {
   modal.classList.remove('active');
   modal.setAttribute('aria-hidden', 'true');
@@ -88,7 +74,7 @@ closeBtn.addEventListener('click', () => {
 });
 
 modal.addEventListener('click', (e) => {
-  if(e.target === modal) {
+  if (e.target === modal) {
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
     modalImg.src = '';
@@ -96,15 +82,16 @@ modal.addEventListener('click', (e) => {
 });
 
 document.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape' && modal.classList.contains('active')) {
+  if (e.key === 'Escape' && modal.classList.contains('active')) {
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
     modalImg.src = '';
   }
 });
 
+// Dark mode toggle
 function setDarkMode(enabled) {
-  if(enabled) {
+  if (enabled) {
     document.body.classList.add('dark-mode');
     modeToggle.textContent = 'Switch to Light Mode';
   } else {
@@ -136,7 +123,7 @@ modeToggle.textContent = darkModeOn ? 'Light Mode' : 'Dark Mode';
 
 downloadLink.addEventListener('click', (e) => {
   e.preventDefault();
-  if(!modalImg.src) return;
+  if (!modalImg.src) return;
   const link = document.createElement('a');
   link.href = modalImg.src;
   link.download = modalImg.src.split('/').pop();
@@ -145,5 +132,5 @@ downloadLink.addEventListener('click', (e) => {
   document.body.removeChild(link);
 });
 
-// Last inn bilder ved oppstart
+// Last inn bilder ved start
 loadImages(currentCategory);
