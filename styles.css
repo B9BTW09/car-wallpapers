@@ -1,0 +1,268 @@
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  background-color: #f9f9f9;
+  color: #222;
+  min-height: 100vh;
+  padding: 30px 15px;
+  user-select: none;
+}
+
+body.dark-mode {
+  background-color: #121212;
+  color: #eee;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  margin-bottom: 5px;
+}
+
+header p {
+  font-size: 1.2rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+/* Device switch */
+.device-switch {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.device-switch label {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 0 15px;
+  user-select: none;
+}
+
+.device-switch input[type="radio"] {
+  margin-right: 8px;
+}
+
+/* Categories */
+.categories {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.categories button.category {
+  background-color: #ddd;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0 10px 10px 0;
+  padding: 10px 26px;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.12);
+  user-select: none;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+body.dark-mode .categories button.category {
+  background-color: #444;
+  color: #eee;
+  box-shadow: 0 3px 8px rgba(255 255 255 / 0.12);
+}
+
+.categories button.category:hover {
+  background-color: #bbb;
+}
+
+body.dark-mode .categories button.category:hover {
+  background-color: #666;
+}
+
+.categories button.category.active {
+  background-color: #007aff;
+  color: white;
+  box-shadow: 0 6px 20px rgb(0 122 255 / 0.5);
+}
+
+/* Gallery grid */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.gallery img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 6px 15px rgb(0 0 0 / 0.1);
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+  filter: drop-shadow(0 2px 6px rgb(0 0 0 / 0.08));
+}
+
+body.dark-mode .gallery img {
+  box-shadow: 0 6px 15px rgba(255 255 255 / 0.15);
+  filter: drop-shadow(0 2px 6px rgba(255 255 255 / 0.08));
+}
+
+.gallery img:hover {
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 15px 30px rgb(0 0 0 / 0.15);
+  filter: drop-shadow(0 6px 15px rgb(0 0 0 / 0.15));
+  z-index: 2;
+}
+
+body.dark-mode .gallery img:hover {
+  box-shadow: 0 15px 30px rgba(255 255 255 / 0.25);
+  filter: drop-shadow(0 6px 15px rgba(255 255 255 / 0.25));
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  z-index: 999;
+}
+
+.modal[aria-hidden="false"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px 24px 30px;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeInScale 0.35s ease forwards;
+}
+
+body.dark-mode .modal-content {
+  background: #222;
+  box-shadow: 0 20px 60px rgba(255 255 255 / 0.15);
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+#modal-img {
+  max-width: 100%;
+  max-height: 60vh;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.2);
+  margin-bottom: 18px;
+  user-select: none;
+}
+
+body.dark-mode #modal-img {
+  box-shadow: 0 12px 40px rgba(255 255 255 / 0.2);
+}
+
+.close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 3rem;
+  color: #444;
+  cursor: pointer;
+  transition: color 0.25s ease;
+  line-height: 1;
+  font-weight: 900;
+  user-select: none;
+}
+
+body.dark-mode .close {
+  color: #ccc;
+}
+
+.close:hover {
+  color: #000;
+}
+
+body.dark-mode .close:hover {
+  color: white;
+}
+
+#download-link {
+  background-color: #007aff;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 12px 28px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgb(0 122 255 / 0.4);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  user-select: none;
+  font-size: 1rem;
+}
+
+#download-link:hover {
+  background-color: #005ecb;
+  box-shadow: 0 8px 25px rgb(0 94 203 / 0.7);
+}
+
+/* Dark mode toggle button */
+.mode-toggle {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  padding: 12px 26px;
+  border-radius: 30px;
+  background-color: #007aff;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgb(0 122 255 / 0.6);
+  transition:
+    background-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+  user-select: none;
+  z-index: 1100;
+}
+
+.mode-toggle:hover {
+  background-color: #005ecb;
+  box-shadow: 0 10px 35px rgb(0 94 203 / 0.8);
+  transform: scale(1.15);
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Car Wallpapers</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Car Wallpapers</h1>
+    <p>Choose your device and favorite car brand</p>
+  </header>
+
+  <div id="device-switch" class="device-switch">
+    <label>
+      <input type="radio" name="device" value="Telefon" checked />
+      Telefon
+    </label>
+    <label>
+      <input type="radio" name="device" value="PC" />
+      PC
+    </label>
+  </div>
+
+  <div id="categories" class="categories">
+    <button class="category active" data-category="all">All</button>
+    <button class="category" data-category="BMW">BMW</button>
+    <button class="category" data-category="Toyota">Toyota</button>
+    <button class="category" data-category="Porsche">Porsche</button>
+  </div>
+
+  <div id="gallery" class="gallery"></div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div id="modal-content" class="modal-content">
+      <button id="close" class="close">&times;</button>
+      <img id="modal-img" alt="Large car wallpaper" />
+      <a id="download-link" href="#" download>Download</a>
+    </div>
+  </div>
+
+  <button id="mode-toggle" class="mode-toggle">Dark Mode</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
