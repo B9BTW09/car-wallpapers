@@ -13,14 +13,8 @@
   </header>
 
   <div id="device-switch" class="device-switch">
-    <label>
-      <input type="radio" name="device" value="Telefon" checked />
-      Telefon
-    </label>
-    <label>
-      <input type="radio" name="device" value="PC" />
-      PC
-    </label>
+    <label><input type="radio" name="device" value="Telefon" checked /> Telefon</label>
+    <label><input type="radio" name="device" value="PC" /> PC</label>
   </div>
 
   <div id="categories" class="categories">
@@ -32,21 +26,17 @@
 
   <div id="gallery" class="gallery"></div>
 
-  <!-- Modal -->
   <div id="modal" class="modal" aria-hidden="true">
-    <div id="modal-content" class="modal-content">
+    <div class="modal-content">
       <button id="close" class="close">&times;</button>
-      <img id="modal-img" alt="Large car wallpaper" />
+      <img id="modal-img" alt="Large wallpaper" />
       <a id="download-link" href="#" download>Download</a>
     </div>
   </div>
 
   <button id="mode-toggle" class="mode-toggle">Dark Mode</button>
 
-  <!-- Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
-
-  <!-- Script -->
   <script src="script.js"></script>
 </body>
 </html>
+
