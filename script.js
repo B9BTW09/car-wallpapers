@@ -1,4 +1,4 @@
-// Init Supabase klient
+// Init Supabase client
 const SUPABASE_URL = 'https://bsgj3w47v0j3iag9lhjv-g.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_bsgj3w47v0J3iAg9lhJV-g_efBs9ioa';
 
@@ -16,6 +16,7 @@ const modeToggle = document.getElementById('mode-toggle');
 let currentCategory = 'all';
 let currentDevice = 'Telefon';
 
+// Fetch images from Supabase storage
 async function fetchImages(category, device) {
   let path = `car-wallpapers/${device}`;
   if (category !== 'all') {
@@ -33,10 +34,12 @@ async function fetchImages(category, device) {
   return data;
 }
 
+// Get public URL for image path
 function getImageURL(path) {
   return `${SUPABASE_URL}/storage/v1/object/public/${path}`;
 }
 
+// Load images into gallery
 async function loadImages(category) {
   gallery.innerHTML = '';
   let images = [];
@@ -78,6 +81,7 @@ async function loadImages(category) {
   });
 }
 
+// Device switch event
 deviceSwitchRadios.forEach(radio => {
   radio.addEventListener('change', () => {
     currentDevice = radio.value;
@@ -85,6 +89,7 @@ deviceSwitchRadios.forEach(radio => {
   });
 });
 
+// Category buttons event
 categories.forEach(btn => {
   btn.addEventListener('click', () => {
     categories.forEach(b => b.classList.remove('active'));
@@ -94,6 +99,7 @@ categories.forEach(btn => {
   });
 });
 
+// Close modal events
 closeBtn.addEventListener('click', () => {
   modal.classList.remove('active');
   modal.setAttribute('aria-hidden', 'true');
@@ -116,6 +122,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Dark mode toggle and persistence
 function setDarkMode(enabled) {
   if (enabled) {
     document.body.classList.add('dark-mode');
@@ -147,8 +154,10 @@ modeToggle.addEventListener('mouseleave', () => {
 
 modeToggle.textContent = darkModeOn ? 'Light Mode' : 'Dark Mode';
 
+// Load initial images
 loadImages(currentCategory);
 
+// Download image forced download
 downloadLink.addEventListener('click', (e) => {
   e.preventDefault();
   if (!modalImg.src) return;
