@@ -1,6 +1,8 @@
+// Konfigurasjon Supabase
 const SUPABASE_URL = 'https://bsgj3w47v0j3iag9lhjv-g.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_bsgj3w47v0J3iAg9lhJV-g_efBs9ioa';
 
+// INITIALISER Supabase client
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const gallery = document.getElementById('gallery');
@@ -15,6 +17,7 @@ const modeToggle = document.getElementById('mode-toggle');
 let currentCategory = 'all';
 let currentDevice = 'Telefon';
 
+// Hent bilder fra Supabase bucket
 async function fetchImages(category, device) {
   let prefix = `car-wallpapers/${device}/${category === 'all' ? '' : category}`;
   prefix = prefix.replace(/\/+/g, '/').replace(/\/$/, '');
@@ -30,10 +33,12 @@ async function fetchImages(category, device) {
   return data;
 }
 
+// Lag URL for bilde
 function getImageURL(path) {
   return `${SUPABASE_URL}/storage/v1/object/public/car-wallpapers/${path}`;
 }
 
+// Last inn bilder og vis i galleri
 async function loadImages(category) {
   gallery.innerHTML = '';
   let imgs = [];
@@ -68,6 +73,7 @@ async function loadImages(category) {
   });
 }
 
+// Events for å endre device (Telefon/PC)
 deviceSwitchRadios.forEach(radio => {
   radio.addEventListener('change', () => {
     currentDevice = radio.value;
@@ -75,6 +81,7 @@ deviceSwitchRadios.forEach(radio => {
   });
 });
 
+// Events for kategori-knapper
 categories.forEach(btn => {
   btn.addEventListener('click', () => {
     categories.forEach(b => b.classList.remove('active'));
@@ -84,12 +91,14 @@ categories.forEach(btn => {
   });
 });
 
+// Lukke modal
 closeBtn.addEventListener('click', () => {
   modal.classList.remove('active');
   modal.setAttribute('aria-hidden', 'true');
   modalImg.src = '';
 });
 
+// Lukke modal ved klikk utenfor bilde
 modal.addEventListener('click', e => {
   if (e.target === modal) {
     modal.classList.remove('active');
@@ -98,6 +107,7 @@ modal.addEventListener('click', e => {
   }
 });
 
+// Lukke modal med ESC
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && modal.classList.contains('active')) {
     modal.classList.remove('active');
@@ -106,7 +116,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// Dark mode toggle and persist
+// Dark mode toggle og lagring
 function setDarkMode(enabled) {
   if (enabled) {
     document.body.classList.add('dark-mode');
@@ -129,5 +139,5 @@ modeToggle.addEventListener('click', () => {
   setDarkMode(darkModeOn);
 });
 
-// Load images første gang
+// Last inn bilder første gang
 loadImages(currentCategory);
