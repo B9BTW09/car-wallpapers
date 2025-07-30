@@ -1,8 +1,6 @@
-// Konfigurasjon Supabase
 const SUPABASE_URL = 'https://bsgj3w47v0j3iag9lhjv-g.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_bsgj3w47v0J3iAg9lhJV-g_efBs9ioa';
 
-// INITIALISER Supabase client
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const gallery = document.getElementById('gallery');
@@ -17,45 +15,33 @@ const modeToggle = document.getElementById('mode-toggle');
 let currentCategory = 'all';
 let currentDevice = 'Telefon';
 
-// Hent bilder fra Supabase bucket
 async function fetchImages(category, device) {
-  let prefix = `car-wallpapers/${device}/${category === 'all' ? '' : category}`;
-  prefix = prefix.replace(/\/+/g, '/').replace(/\/$/, '');
+  // Fiks path til Supabase-bucket-mappene
+  let prefix = 'car-wallpapers/';
+  if(device) prefix += device + '/';
+  if(category && category !== 'all') prefix += category + '/';
 
-  const { data, error } = await supabase.storage
-    .from('car-wallpapers')
-    .list(prefix, { limit: 100, offset: 0 });
+  // Hent filer fra Supabase Storage
+  const { data, error } = await supabase.storage.from('car-wallpapers').list(prefix);
 
-  if (error) {
+  if(error) {
     console.error('Feil ved henting av bilder:', error);
     return [];
   }
   return data;
 }
 
-// Lag URL for bilde
 function getImageURL(path) {
   return `${SUPABASE_URL}/storage/v1/object/public/car-wallpapers/${path}`;
 }
 
-// Last inn bilder og vis i galleri
 async function loadImages(category) {
   gallery.innerHTML = '';
-  let imgs = [];
-
-  if (category === 'all') {
-    const allCategories = ['BMW', 'Toyota', 'Porsche'];
-    for (const cat of allCategories) {
-      const data = await fetchImages(cat, currentDevice);
-      imgs = imgs.concat(data);
-    }
-  } else {
-    imgs = await fetchImages(category, currentDevice);
-  }
+  const imgs = await fetchImages(category, currentDevice);
 
   imgs.forEach((imgObj, i) => {
     const img = document.createElement('img');
-    img.src = getImageURL(`${currentDevice}/${imgObj.name}`);
+    img.src = getImageURL(`${currentDevice}/${category === 'all' ? '' : category + '/'}${imgObj.name}`);
     img.alt = `Car wallpaper ${category} ${i + 1}`;
     img.style.opacity = '0';
     img.style.transition = `opacity 0.6s ease ${i * 0.15}s`;
@@ -63,9 +49,9 @@ async function loadImages(category) {
       img.style.opacity = '1';
     });
     img.addEventListener('click', () => {
-      modalImg.src = getImageURL(`${currentDevice}/${imgObj.name}`);
-      modalImg.alt = `Car wallpaper large ${category} ${i + 1}`;
-      downloadLink.href = getImageURL(`${currentDevice}/${imgObj.name}`);
+      modalImg.src = img.src;
+      modalImg.alt = img.alt;
+      downloadLink.href = img.src;
       modal.classList.add('active');
       modal.setAttribute('aria-hidden', 'false');
     });
@@ -73,7 +59,7 @@ async function loadImages(category) {
   });
 }
 
-// Events for å endre device (Telefon/PC)
+// Event listeners for device switch
 deviceSwitchRadios.forEach(radio => {
   radio.addEventListener('change', () => {
     currentDevice = radio.value;
@@ -81,7 +67,7 @@ deviceSwitchRadios.forEach(radio => {
   });
 });
 
-// Events for kategori-knapper
+// Event listeners for category buttons
 categories.forEach(btn => {
   btn.addEventListener('click', () => {
     categories.forEach(b => b.classList.remove('active'));
@@ -91,34 +77,34 @@ categories.forEach(btn => {
   });
 });
 
-// Lukke modal
+// Close modal button
 closeBtn.addEventListener('click', () => {
   modal.classList.remove('active');
   modal.setAttribute('aria-hidden', 'true');
   modalImg.src = '';
 });
 
-// Lukke modal ved klikk utenfor bilde
-modal.addEventListener('click', e => {
-  if (e.target === modal) {
+// Close modal clicking outside image
+modal.addEventListener('click', (e) => {
+  if(e.target === modal) {
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
     modalImg.src = '';
   }
 });
 
-// Lukke modal med ESC
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && modal.classList.contains('active')) {
+// Close modal with ESC key
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && modal.classList.contains('active')) {
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
     modalImg.src = '';
   }
 });
 
-// Dark mode toggle og lagring
+// Dark mode toggle and persist
 function setDarkMode(enabled) {
-  if (enabled) {
+  if(enabled) {
     document.body.classList.add('dark-mode');
     modeToggle.textContent = 'Switch to Light Mode';
   } else {
@@ -139,5 +125,27 @@ modeToggle.addEventListener('click', () => {
   setDarkMode(darkModeOn);
 });
 
-// Last inn bilder første gang
+modeToggle.addEventListener('mouseenter', () => {
+  modeToggle.textContent = darkModeOn ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+});
+
+modeToggle.addEventListener('mouseleave', () => {
+  modeToggle.textContent = darkModeOn ? 'Light Mode' : 'Dark Mode';
+});
+
+modeToggle.textContent = darkModeOn ? 'Light Mode' : 'Dark Mode';
+
+// Download button forced download function
+downloadLink.addEventListener('click', (e) => {
+  e.preventDefault();
+  if(!modalImg.src) return;
+  const link = document.createElement('a');
+  link.href = modalImg.src;
+  link.download = modalImg.src.split('/').pop();
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+});
+
+// Initial load
 loadImages(currentCategory);
