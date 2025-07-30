@@ -96,6 +96,13 @@ body.dark-mode .categories button.category:hover {
   box-shadow: 0 6px 20px rgb(0 122 255 / 0.5);
 }
 
+/* Legg til for active i dark mode */
+body.dark-mode .categories button.category.active {
+  background-color: #3399ff;
+  color: white;
+  box-shadow: 0 6px 20px rgba(51, 153, 255, 0.7);
+}
+
 /* Gallery grid */
 .gallery {
   display: grid;
